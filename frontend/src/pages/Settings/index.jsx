@@ -2,7 +2,6 @@ import Tab from 'react-bootstrap/Tab'
 import Tabs from 'react-bootstrap/Tabs'
 import TankManagement from './TankManagement'
 import AlertThresholds from './AlertThresholds'
-import DeviceStatus from './DeviceStatus'
 import UserPreferences from './UserPreferences'
 
 export default function Settings() {
@@ -22,11 +21,6 @@ export default function Settings() {
         <Tab eventKey="alerts" title="Alert Thresholds">
           <div className="pt-4">
             <AlertThresholds />
-          </div>
-        </Tab>
-        <Tab eventKey="devices" title="Devices">
-          <div className="pt-4">
-            <DeviceStatus />
           </div>
         </Tab>
         <Tab eventKey="prefs" title="Preferences">

@@ -8,6 +8,8 @@
   --color-peach: #ffb399;
   --color-sand: #ffd6a6;
   --color-cream: #fff0be;
+  --color-teal: #0f766e;
+  --color-blue: #2563eb;
 
   /* Surfaces — light (“paper”) */
   --color-bg: #fbf7f2;
@@ -48,6 +50,8 @@
   --color-muted: #7a6a5a;
   --color-text: #fff0be;
   --color-text-muted: #7a6a5a;
+  --color-teal: #2dd4bf;
+  --color-blue: #60a5fa;
 
   --bs-body-bg: var(--color-bg);
   --bs-body-color: var(--color-text);
@@ -79,17 +83,67 @@ body {
   min-height: 100vh;
 }
 
-.sidebar-col {
+.top-nav {
   background: var(--color-surface);
   border-color: var(--color-border) !important;
-  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.top-nav-inner {
+  align-items: center;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 0.875rem 1.5rem;
+}
+
+.top-nav-brand {
+  flex: 0 0 auto;
+}
+
+.top-nav-links {
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.top-nav-links .nav-link {
+  align-items: center !important;
+  line-height: 1.25;
+  min-height: 2.5rem;
+  white-space: nowrap;
+}
+
+.top-nav-links .nav-link svg {
+  flex: 0 0 auto;
+  margin-top: -1px;
+}
+
+.top-nav-badge {
+  align-items: center;
+  display: inline-flex !important;
+  line-height: 1.1;
+  min-height: 1.4rem;
+  padding-top: 0.15rem;
 }
 
 @media (max-width: 767.98px) {
-  .sidebar-col {
-    min-height: auto;
-    border-right: none !important;
-    border-bottom: 1px solid var(--color-border);
+  .top-nav-inner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .top-nav-links {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.125rem;
+    width: 100%;
   }
 }
 
@@ -108,7 +162,6 @@ body {
 }
 
 .active-nav-link {
-  border-left: 3px solid var(--color-coral);
   background: color-mix(in oklab, var(--color-coral), transparent 88%);
   color: var(--color-text) !important;
 }
@@ -116,22 +169,6 @@ body {
 [data-bs-theme='dark'] .active-nav-link {
   background: rgba(255, 154, 134, 0.08);
   color: var(--color-cream) !important;
-}
-
-.matrix-cell {
-  cursor: pointer;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
-}
-
-.matrix-cell:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(44, 36, 31, 0.12);
-}
-
-[data-bs-theme='dark'] .matrix-cell:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
 }
 
 .sparkline-wrap .recharts-wrapper {

@@ -5,7 +5,6 @@ import { mockTanks } from '../mockData'
 export const useTankStore = create((set, get) => ({
   tanks: [...mockTanks],
   selectedTankId: null,
-  viewMode: 'card',
 
   setTanks: (next) =>
     set((state) => ({
@@ -13,8 +12,6 @@ export const useTankStore = create((set, get) => ({
     })),
 
   selectTank: (id) => set({ selectedTankId: id }),
-
-  setViewMode: (mode) => set({ viewMode: mode }),
 
   updateTank: (id, patch) =>
     set((state) => ({

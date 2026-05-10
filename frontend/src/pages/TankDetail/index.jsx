@@ -7,10 +7,8 @@ import { ArrowLeft } from 'lucide-react'
 import { useTankData } from '../../hooks/useTankData'
 import HealthBadge from '../../components/HealthBadge'
 import LiveAudio from './tabs/LiveAudio'
-import FFTAnalysis from './tabs/FFTAnalysis'
 import TrendGraphs from './tabs/TrendGraphs'
 import Calibration from './tabs/Calibration'
-import AudioPlayback from './tabs/AudioPlayback'
 import Environmental from './tabs/Environmental'
 
 function statusLabel(status) {
@@ -26,10 +24,8 @@ export default function TankDetail() {
   const tabItems = useMemo(
     () => [
       { key: 'live', title: 'Live Audio', Comp: LiveAudio },
-      { key: 'fft', title: 'FFT Analysis', Comp: FFTAnalysis },
       { key: 'trends', title: 'Trends', Comp: TrendGraphs },
       { key: 'cal', title: 'Calibration', Comp: Calibration },
-      { key: 'play', title: 'Playback', Comp: AudioPlayback },
       { key: 'env', title: 'Environment', Comp: Environmental },
     ],
     [],

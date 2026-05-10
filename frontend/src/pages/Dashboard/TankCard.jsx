@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ResponsiveContainer, LineChart, Line, Tooltip } from 'recharts'
 import HealthBadge from '../../components/HealthBadge'
 import StatusDot from '../../components/StatusDot'
-import { mockSessionHistory } from '../../mockData'
+import { getBaselineSignalLevel, getSignalLevel, mockSessionHistory } from '../../mockData'
 
 function statusLabel(status) {
   if (status === 'healthy') return 'Healthy'
@@ -21,6 +21,8 @@ export default function TankCard({ tank }) {
   const navigate = useNavigate()
   const history = mockSessionHistory[tank.id] ?? []
   const spark = history.slice(-7).map((row) => ({ h: row.healthScore }))
+  const signalLevel = getSignalLevel(tank)
+  const baselineSignal = getBaselineSignalLevel(tank)
 
   return (
     <Card
@@ -51,9 +53,9 @@ export default function TankCard({ tank }) {
         </div>
 
         <div className="d-flex justify-content-between align-items-baseline small border-top border-secondary-subtle pt-2">
-          <span className="text-secondary">Click rate</span>
+          <span className="text-secondary">Signal strength</span>
           <span className="font-mono-nums">
-            {tank.clicksPerMinute} / <span className="text-secondary">{tank.baselineClicks} baseline</span>
+            {signalLevel.toFixed(1)} / <span className="text-secondary">{baselineSignal.toFixed(1)} normal</span>
           </span>
         </div>
 
@@ -68,7 +70,7 @@ export default function TankCard({ tank }) {
                   color: 'var(--color-text)',
                 }}
               />
-              <Line type="monotone" dataKey="h" stroke="var(--color-peach)" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="h" stroke="var(--color-peach)" strokeWidth={2} dot={false} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

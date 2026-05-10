@@ -4,7 +4,6 @@ import Button from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
 import { Link } from 'react-router-dom'
 import { useAlerts } from '../../hooks/useAlerts'
-import { useAlertStore } from '../../store/alertStore'
 
 function severityRank(s) {
   if (s === 'critical') return 0
@@ -50,7 +49,6 @@ export default function Alerts() {
 
   const all = useAlerts('all')
   const filtered = useAlerts(tab === 'all' ? undefined : tab)
-  const resolveAlert = useAlertStore((s) => s.resolveAlert)
 
   const sorted = useMemo(
     () =>
@@ -112,9 +110,6 @@ export default function Alerts() {
               <div className="small">{a.suggestedAction}</div>
             </div>
 
-            <Button className="mt-3" size="sm" variant="outline-primary" onClick={() => resolveAlert(a.id)}>
-              Mark resolved
-            </Button>
           </div>
         ))}
 

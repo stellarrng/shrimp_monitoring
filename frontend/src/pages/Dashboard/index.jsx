@@ -1,18 +1,12 @@
 import { useMemo } from 'react'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
-import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
-import { LayoutGrid, Grid3x3 } from 'lucide-react'
 import { useTankStore } from '../../store/tankStore'
 import TankCard from './TankCard'
-import MatrixView from './MatrixView'
 import { useAlerts } from '../../hooks/useAlerts'
 
 export default function Dashboard() {
   const tanks = useTankStore((s) => s.tanks)
-  const viewMode = useTankStore((s) => s.viewMode)
-  const setViewMode = useTankStore((s) => s.setViewMode)
 
   const activeAlerts = useAlerts('all')
 
@@ -33,37 +27,15 @@ export default function Dashboard() {
             {stats.tanks} tanks · <span>{stats.alerts}</span> active alerts
           </div>
         </div>
-        <ButtonGroup aria-label="View mode">
-          <Button
-            variant={viewMode === 'card' ? 'primary' : 'outline-secondary'}
-            onClick={() => setViewMode('card')}
-            className="d-flex align-items-center gap-2"
-          >
-            <LayoutGrid size={18} />
-            Card view
-          </Button>
-          <Button
-            variant={viewMode === 'matrix' ? 'primary' : 'outline-secondary'}
-            onClick={() => setViewMode('matrix')}
-            className="d-flex align-items-center gap-2"
-          >
-            <Grid3x3 size={18} />
-            Matrix view
-          </Button>
-        </ButtonGroup>
       </div>
 
-      {viewMode === 'matrix' ? (
-        <MatrixView tanks={tanks} />
-      ) : (
-        <Row xs={1} md={2} xl={3} className="g-4">
-          {tanks.map((tank) => (
-            <Col key={tank.id}>
-              <TankCard tank={tank} />
-            </Col>
-          ))}
-        </Row>
-      )}
+      <Row xs={1} md={2} xl={3} className="g-4">
+        {tanks.map((tank) => (
+          <Col key={tank.id}>
+            <TankCard tank={tank} />
+          </Col>
+        ))}
+      </Row>
     </div>
   )
 }

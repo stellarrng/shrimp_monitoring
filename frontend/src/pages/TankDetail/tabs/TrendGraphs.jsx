@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { mockTankTrendExtended } from '../../../mockData'
+import { getBaselineSignalLevel, mockTankTrendExtended } from '../../../mockData'
 
 /** TODO: replace with aggregated analytics API */
 export default function TrendGraphs({ tank }) {
@@ -21,18 +21,21 @@ export default function TrendGraphs({ tank }) {
 
   const data = useMemo(() => {
     const src = mockTankTrendExtended[tank.id] ?? []
-    return src.slice(-range)
+    return src.slice(-range).map((row) => ({
+      ...row,
+      signalRms: row.signalRms,
+    }))
   }, [tank.id, range])
 
-  const sessionBaseline = useMemo(() => Math.round((tank.baselineClicks || 18) * 12), [tank.baselineClicks])
+  const signalBaseline = useMemo(() => getBaselineSignalLevel(tank), [tank])
 
   const lineColor = useMemo(() => {
-    const last = data[data.length - 1]?.clicks ?? 0
-    const pct = sessionBaseline === 0 ? 1 : last / sessionBaseline
+    const last = data[data.length - 1]?.signalRms ?? 0
+    const pct = signalBaseline === 0 ? 1 : last / signalBaseline
     if (pct >= 0.85) return 'var(--color-healthy)'
     if (pct >= 0.6) return 'var(--color-warning)'
     return 'var(--color-critical)'
-  }, [data, sessionBaseline])
+  }, [data, signalBaseline])
 
   return (
     <div className="d-flex flex-column gap-4">
@@ -51,7 +54,7 @@ export default function TrendGraphs({ tank }) {
         </ButtonGroup>
       </div>
 
-      <TrendPanel title="Feeding activity trend" subtitle={`Baseline ~ ${sessionBaseline} clicks/session (from cpm)`}>
+      <TrendPanel title="Signal strength trend" subtitle={`Normal level ${signalBaseline.toFixed(1)}`}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -66,7 +69,7 @@ export default function TrendGraphs({ tank }) {
               }}
             />
             <ReferenceLine
-              y={sessionBaseline}
+              y={signalBaseline}
               stroke="rgba(255,240,190,0.35)"
               strokeDasharray="5 6"
               label={{
@@ -75,7 +78,7 @@ export default function TrendGraphs({ tank }) {
                 fill: 'rgba(255,240,190,0.75)',
               }}
             />
-            <Line type="monotone" dataKey="clicks" stroke={lineColor} dot={false} strokeWidth={2} />
+            <Line type="monotone" dataKey="signalRms" stroke={lineColor} dot={false} strokeWidth={2} isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
       </TrendPanel>
@@ -100,7 +103,7 @@ export default function TrendGraphs({ tank }) {
                 color: 'var(--color-text)',
               }}
             />
-            <Area type="monotone" dataKey="healthScore" stroke="#ffb399" fill={`url(#health-${tank.id})`} />
+            <Area type="monotone" dataKey="healthScore" stroke="#ffb399" fill={`url(#health-${tank.id})`} isAnimationActive={false} />
           </AreaChart>
         </ResponsiveContainer>
       </TrendPanel>
@@ -119,7 +122,7 @@ export default function TrendGraphs({ tank }) {
                 color: 'var(--color-text)',
               }}
             />
-            <Line type="monotone" dataKey="noiseDb" stroke="var(--color-sand)" dot={false} strokeWidth={2} />
+            <Line type="monotone" dataKey="noiseDb" stroke="var(--color-blue)" dot={false} strokeWidth={2} isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
       </TrendPanel>

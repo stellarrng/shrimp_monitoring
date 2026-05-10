@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useTankStore } from '../store/tankStore'
 
-/** TODO: connect to WebSocket — currently simulates live click drift */
+/** TODO: connect to WebSocket — currently simulates live signal drift */
 export function useWebSocket() {
   const patchLiveTelemetry = useTankStore((s) => s.patchLiveTelemetry)
 
@@ -16,9 +16,9 @@ export function useWebSocket() {
         const delta = Math.round((Math.random() - 0.45) * 2)
         const t = useTankStore.getState().getTankById(tankId)
         if (!t) return
-        const base = typeof t.clicksPerMinute === 'number' ? t.clicksPerMinute : 18
-        const next = Math.max(2, Math.min(60, base + delta))
-        patchLiveTelemetry(tankId, { clicksPerMinute: next })
+        const base = typeof t.signalRms === 'number' ? t.signalRms : 1.5
+        const next = Number(Math.max(0.2, Math.min(4, base + delta * 0.04)).toFixed(2))
+        patchLiveTelemetry(tankId, { signalRms: next })
       })
     }, 2000)
 

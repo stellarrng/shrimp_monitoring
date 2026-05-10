@@ -1,35 +1,13 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 
-/** Oscilloscope-style scrolling LineChart — TODO: connect to WebSocket audio frames */
+/** Oscilloscope-style waveform snapshot — TODO: connect to WebSocket audio frames */
 export default function LiveWaveform({ label, color, filtered }) {
-  const [data, setData] = useState(() => {
-    const pts = 64
-    return Array.from({ length: pts }, (_, i) => ({
-      t: i,
-      v: filtered ? Math.sin(i / 4) * 0.4 + (Math.random() - 0.5) * 0.15 : (Math.random() - 0.5) * 2.2,
-    }))
-  })
+  const data = useMemo(() => buildWaveform(filtered), [filtered])
 
   const domain = useMemo(() => {
     if (filtered) return [-1.2, 1.2]
     return [-3, 3]
-  }, [filtered])
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setData((prev) => {
-        const next = prev.slice(1)
-        const lastT = prev[prev.length - 1].t + 1
-        const noise = (Math.random() - 0.5) * (filtered ? 0.12 : 1.1)
-        const clickSpike = filtered && Math.random() > 0.82 ? 0.55 + Math.random() * 0.35 : 0
-        const wave = filtered ? Math.sin(lastT / 3.2) * 0.35 + noise + clickSpike : noise * 2 + Math.sin(lastT / 2.1) * 0.4
-        next.push({ t: lastT, v: wave })
-        return next
-      })
-    }, 100)
-
-    return () => clearInterval(id)
   }, [filtered])
 
   return (
@@ -46,4 +24,15 @@ export default function LiveWaveform({ label, color, filtered }) {
       </div>
     </div>
   )
+}
+
+function buildWaveform(filtered) {
+  const pts = 96
+  return Array.from({ length: pts }, (_, i) => {
+    const base = filtered ? Math.sin(i / 4.5) * 0.35 : Math.sin(i / 2.3) * 0.55
+    const overtone = Math.sin(i / 1.7 + 1.8) * (filtered ? 0.08 : 0.32)
+    const deterministicNoise = Math.sin(i * 12.9898) * (filtered ? 0.05 : 0.65)
+    const pulse = filtered && i % 24 >= 9 && i % 24 <= 11 ? 0.35 : 0
+    return { t: i, v: Number((base + overtone + deterministicNoise + pulse).toFixed(3)) }
+  })
 }

@@ -5,8 +5,31 @@ import Form from 'react-bootstrap/Form'
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Table from 'react-bootstrap/Table'
 import Badge from 'react-bootstrap/Badge'
-import { mockCalibrationEvents, getCalibrationSessionsForTank } from '../../../mockData'
+import {
+  getBaselineSignalLevel,
+  getCalibrationSessionsForTank,
+  getSignalLevel,
+  mockCalibrationEvents,
+  mockTankTrendExtended,
+} from '../../../mockData'
 import { useTankStore } from '../../../store/tankStore'
+
+function signalStatus(value, average) {
+  if (!average) return { label: 'No baseline', bg: 'secondary' }
+  const ratio = value / average
+  if (ratio >= 0.85) return { label: 'Good', bg: 'success' }
+  if (ratio >= 0.65) return { label: 'Watch', bg: 'warning' }
+  return { label: 'Bad', bg: 'danger' }
+}
+
+function formatPct(value) {
+  if (!Number.isFinite(value)) return '0%'
+  return `${value > 0 ? '+' : ''}${Math.round(value)}%`
+}
+
+function formatLevel(value) {
+  return `${value.toFixed(1)} level`
+}
 
 /** TODO: POST calibration milestones to backend */
 export default function Calibration({ tank }) {
@@ -19,7 +42,24 @@ export default function Calibration({ tank }) {
 
   const sessions = useMemo(() => getCalibrationSessionsForTank(tank), [tank])
 
-  const baselineValue = tank.calibrationComplete ? Math.round((tank.baselineClicks || 18) * 11.5 + 72) : null
+  const currentSignal = getSignalLevel(tank)
+  const baselineValue = tank.calibrationComplete ? getBaselineSignalLevel(tank) : null
+  const monthlyComparison = useMemo(() => {
+    const rows = (mockTankTrendExtended[tank.id] ?? []).map((row) => ({
+      day: row.day,
+      signalRms: row.signalRms,
+    }))
+    const monthAverage = rows.length
+      ? Number((rows.reduce((sum, row) => sum + row.signalRms, 0) / rows.length).toFixed(1))
+      : 0
+    const recent = rows.slice(-7)
+    return {
+      monthAverage,
+      recent,
+      status: signalStatus(currentSignal, monthAverage),
+      deltaPct: monthAverage ? ((currentSignal - monthAverage) / monthAverage) * 100 : 0,
+    }
+  }, [currentSignal, tank.id])
 
   const addEvent = () => {
     if (!note.trim()) return
@@ -42,8 +82,8 @@ export default function Calibration({ tank }) {
             <div className="h6 mb-1">Calibration status</div>
             <div className="text-secondary small">
               {tank.calibrationComplete
-                ? 'Baseline locked — anomaly detection armed'
-                : `Day ${tank.calibrationDay} of 14 — baseline building`}
+                ? 'Normal sound pattern saved - monitoring is active'
+                : `Day ${tank.calibrationDay} of 14 - learning normal sound pattern`}
             </div>
           </div>
           <div className="d-flex gap-2">
@@ -55,24 +95,88 @@ export default function Calibration({ tank }) {
             </Button>
           </div>
         </div>
-        <ProgressBar now={progress} className="mt-3" variant={tank.calibrationComplete ? 'success' : 'warning'} animated={!tank.calibrationComplete} />
+        <ProgressBar now={progress} className="mt-3" variant={tank.calibrationComplete ? 'success' : 'warning'} />
       </div>
 
       <div className="surface-card rounded-3 p-3">
-        <div className="h6 mb-3">Sessions recorded</div>
+        <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+          <div>
+            <div className="h6 mb-1">Monthly signal strength</div>
+            <div className="text-secondary small">Current sound level compared with this tank's monthly average.</div>
+          </div>
+          <Badge bg={monthlyComparison.status.bg} text={monthlyComparison.status.bg === 'warning' ? 'dark' : undefined}>
+            {monthlyComparison.status.label}
+          </Badge>
+        </div>
+        <div className="row g-3 mb-3">
+          <div className="col-md-4">
+            <div className="border border-secondary-subtle rounded-3 p-3 h-100">
+              <div className="small text-secondary">Current strength</div>
+              <div className="h3 font-mono-nums mb-0">{formatLevel(currentSignal)}</div>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="border border-secondary-subtle rounded-3 p-3 h-100">
+              <div className="small text-secondary">Month average</div>
+              <div className="h3 font-mono-nums mb-0">{formatLevel(monthlyComparison.monthAverage)}</div>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="border border-secondary-subtle rounded-3 p-3 h-100">
+              <div className="small text-secondary">Difference</div>
+              <div className="h3 font-mono-nums mb-0">{formatPct(monthlyComparison.deltaPct)}</div>
+            </div>
+          </div>
+        </div>
         <div className="table-responsive">
           <Table hover size="sm" className="mb-0">
             <thead>
               <tr>
-                <th>Session</th>
-                <th className="text-end">Click count</th>
+                <th>Day</th>
+                <th className="text-end">Signal strength</th>
+                <th className="text-end">Vs avg</th>
+                <th className="text-end">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {monthlyComparison.recent.map((row) => {
+                const delta = monthlyComparison.monthAverage
+                  ? ((row.signalRms - monthlyComparison.monthAverage) / monthlyComparison.monthAverage) * 100
+                  : 0
+                const status = signalStatus(row.signalRms, monthlyComparison.monthAverage)
+                return (
+                  <tr key={row.day}>
+                    <td>{row.day}</td>
+                    <td className="text-end font-mono-nums">{formatLevel(row.signalRms)}</td>
+                    <td className="text-end font-mono-nums">{formatPct(delta)}</td>
+                    <td className="text-end">
+                      <Badge bg={status.bg} text={status.bg === 'warning' ? 'dark' : undefined}>
+                        {status.label}
+                      </Badge>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </Table>
+        </div>
+      </div>
+
+      <div className="surface-card rounded-3 p-3">
+        <div className="h6 mb-3">Calibration samples</div>
+        <div className="table-responsive">
+          <Table hover size="sm" className="mb-0">
+            <thead>
+              <tr>
+                <th>Sample</th>
+                <th className="text-end">Signal strength</th>
               </tr>
             </thead>
             <tbody>
               {sessions.map((row) => (
                 <tr key={row.session}>
                   <td>{row.session}</td>
-                  <td className="text-end font-mono-nums">{row.clicksRecorded}</td>
+                  <td className="text-end font-mono-nums">{formatLevel(row.signalRms)}</td>
                 </tr>
               ))}
               {!sessions.length && (
@@ -90,8 +194,8 @@ export default function Calibration({ tank }) {
       {baselineValue != null && (
         <div className="surface-card rounded-3 p-3">
           <div className="small text-secondary">Established baseline</div>
-          <div className="h4 font-mono-nums mb-0">{baselineValue} clicks / session</div>
-          <div className="small text-secondary">Derived mock value from telemetry profile</div>
+          <div className="h4 font-mono-nums mb-0">{formatLevel(baselineValue)}</div>
+          <div className="small text-secondary">Normal signal strength saved for comparison</div>
         </div>
       )}
 

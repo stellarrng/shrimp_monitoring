@@ -60,8 +60,8 @@ export default function Environmental({ tank }) {
       </Row>
 
       <MiniEnv title="Temperature (24h)" series={series} dataKey="temperature" ymin={18} ymax={31} bandMin={20} bandMax={26} color="var(--color-peach)" />
-      <MiniEnv title="pH (24h)" series={series} dataKey="pH" ymin={6.15} ymax={8.05} bandMin={6.5} bandMax={7.5} color="var(--color-sand)" />
-      <MiniEnv title="Dissolved oxygen (24h)" series={series} dataKey="dissolvedOxygen" ymin={2} ymax={8.8} bandMin={5} bandMax={8} color="var(--color-cream)" invertBand />
+      <MiniEnv title="pH (24h)" series={series} dataKey="pH" ymin={6.15} ymax={8.05} bandMin={6.5} bandMax={7.5} color="var(--color-teal)" />
+      <MiniEnv title="Dissolved oxygen (24h)" series={series} dataKey="dissolvedOxygen" ymin={2} ymax={8.8} bandMin={5} bandMax={8} color="var(--color-blue)" invertBand />
     </div>
   )
 }
@@ -114,7 +114,7 @@ function MiniEnv({ title, series, dataKey, ymin, ymax, bandMin, bandMax, color, 
                 <ReferenceArea y1={bandMin} y2={ymax} fill="rgba(255,154,134,0.08)" />
               </>
             )}
-            <Area type="monotone" dataKey={dataKey} stroke={color} fill={`${color}33`} />
+            <Area type="monotone" dataKey={dataKey} stroke={color} fill={color} fillOpacity={0.18} isAnimationActive={false} />
           </AreaChart>
         </ResponsiveContainer>
       </div>

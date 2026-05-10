@@ -2,26 +2,29 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import LiveWaveform from '../../../components/LiveWaveform'
 import { useWebSocket } from '../../../hooks/useWebSocket'
+import { getBaselineSignalLevel, getSignalLevel } from '../../../mockData'
 
 /** TODO: connect to WebSocket for PCM frames */
 export default function LiveAudio({ tank }) {
   useWebSocket()
+  const signalLevel = getSignalLevel(tank)
+  const baselineSignal = getBaselineSignalLevel(tank)
 
   return (
     <div>
       <Row className="g-3 mb-3">
         <Col md={4}>
           <div className="surface-card rounded-3 p-3 h-100">
-            <div className="small text-secondary">Live click estimate</div>
-            <div className="display-6 font-mono-nums">{tank.clicksPerMinute}</div>
-            <div className="small text-secondary">clicks / min (mock drift)</div>
+            <div className="small text-secondary">Live sound signal</div>
+            <div className="display-6 font-mono-nums">{signalLevel.toFixed(1)}</div>
+            <div className="small text-secondary">signal strength</div>
           </div>
         </Col>
         <Col md={4}>
           <div className="surface-card rounded-3 p-3 h-100">
             <div className="small text-secondary">Baseline</div>
-            <div className="display-6 font-mono-nums">{tank.baselineClicks}</div>
-            <div className="small text-secondary">clicks / min target</div>
+            <div className="display-6 font-mono-nums">{baselineSignal.toFixed(1)}</div>
+            <div className="small text-secondary">normal signal strength</div>
           </div>
         </Col>
         <Col md={4}>
