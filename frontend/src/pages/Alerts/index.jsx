@@ -61,7 +61,7 @@ export default function Alerts() {
   )
 
   return (
-    <div className="p-3 p-md-4">
+    <div className="page-root py-3">
       <div className="d-flex flex-column flex-lg-row gap-3 justify-content-lg-between align-items-lg-center mb-3">
         <div>
           <h1 className="h3 mb-1">Active Alerts</h1>

@@ -71,7 +71,6 @@ function ButtonGroupTheme({ theme, setTheme }) {
           Dark
         </Button>
       </div>
-      <div className="form-text mt-2">Themes are driven by CSS — light is default; dark restores the cockpit palette.</div>
     </div>
   )
 }

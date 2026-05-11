@@ -5,6 +5,10 @@ import { mockTanks } from '../mockData'
 export const useTankStore = create((set, get) => ({
   tanks: [...mockTanks],
   selectedTankId: null,
+  /** Live filter for navbar “Search tanks…” — matches name, species, or id (substring, case-insensitive). */
+  tankSearchQuery: '',
+
+  setTankSearchQuery: (tankSearchQuery) => set({ tankSearchQuery }),
 
   setTanks: (next) =>
     set((state) => ({

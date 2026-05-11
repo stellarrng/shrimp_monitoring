@@ -1,5 +1,4 @@
 import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
-import Container from 'react-bootstrap/Container'
 import AlertBanner from './components/AlertBanner'
 import Navbar from './components/Navbar'
 import Dashboard from './pages/Dashboard/index'
@@ -11,13 +10,15 @@ import { useWebSocket } from './hooks/useWebSocket'
 function AppShell() {
   useWebSocket()
   return (
-    <Container fluid className="p-0 overflow-x-hidden">
+    <div className="app-viewport overflow-x-hidden">
       <Navbar />
-      <main className="min-vh-100">
-        <AlertBanner />
-        <Outlet />
-      </main>
-    </Container>
+      <AlertBanner />
+      <div className="app-shell">
+        <main className="app-shell-main">
+          <Outlet />
+        </main>
+      </div>
+    </div>
   )
 }
 
