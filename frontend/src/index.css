@@ -1,6 +1,5 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-/* Default: warm LIGHT theme — brand + status hues match acoustic monitor spec */
 
 :root {
   /* Primary brand colors */
@@ -24,6 +23,7 @@
   /* Text on light backgrounds */
   --color-text: #231e19;
   --color-text-muted: #6e6258;
+  --app-padding-inline: clamp(1rem, 4vw, 2.25rem);
 
   --bs-body-bg: var(--color-bg);
   --bs-body-color: var(--color-text);
@@ -42,16 +42,24 @@
   --bs-danger: #e07a68;
 }
 
-/* Optional dark cockpit — activated from Settings ▸ Preferences */
 [data-bs-theme='dark'] {
-  --color-bg: #1a1612;
-  --color-surface: #231e19;
-  --color-border: #3a3028;
-  --color-muted: #7a6a5a;
-  --color-text: #fff0be;
-  --color-text-muted: #7a6a5a;
-  --color-teal: #2dd4bf;
-  --color-blue: #60a5fa;
+  /* Neutral dark surfaces (common high-contrast pattern) */
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-border: #30363d;
+  --color-muted: #8b949e;
+  --color-text: #e6edf3;
+  --color-text-muted: #8b949e;
+  --color-cream: #f0f6fc;
+
+  --color-teal: #56d4dd;
+  --color-blue: #58a6ff;
+
+  /* Semantics tuned for dark backgrounds */
+  --color-healthy: #3fb950;
+  --color-warning: #d29922;
+  --color-critical: #f85149;
+  --color-sand: #d29922;
 
   --bs-body-bg: var(--color-bg);
   --bs-body-color: var(--color-text);
@@ -60,9 +68,14 @@
   --bs-card-bg: var(--color-surface);
   --bs-card-border-color: var(--color-border);
   --bs-emphasis-color: var(--color-text);
-  --bs-link-color: var(--color-peach);
-  --bs-link-hover-color: var(--color-coral);
+  --bs-link-color: #79c0ff;
+  --bs-link-hover-color: #a5d6ff;
   --bs-secondary: var(--color-muted);
+  --bs-primary: #ff9a86;
+  --bs-primary-rgb: 255, 154, 134;
+  --bs-success: var(--color-healthy);
+  --bs-warning: var(--color-warning);
+  --bs-danger: var(--color-critical);
 }
 
 body {
@@ -83,6 +96,47 @@ body {
   min-height: 100vh;
 }
 
+.app-viewport {
+  min-height: 100vh;
+}
+
+.app-shell {
+  margin-inline: auto;
+  max-width: 1400px;
+  padding-inline: var(--app-padding-inline);
+  padding-bottom: 1.5rem;
+  width: 100%;
+}
+
+.app-shell-main {
+  min-height: calc(100vh - 4rem);
+}
+
+.page-root {
+  min-width: 0;
+}
+
+.alert-banner-edge {
+  border-radius: 0 !important;
+  margin-bottom: 0 !important;
+  padding-block: 0.65rem;
+  padding-inline: 0;
+  width: 100%;
+}
+
+.alert-banner-edge.alert-dismissible {
+  padding-right: 3.25rem;
+}
+
+.alert-banner-inner {
+  box-sizing: border-box;
+  margin-inline: auto;
+  max-width: 1400px;
+  min-width: 0;
+  padding-inline: var(--app-padding-inline);
+  width: 100%;
+}
+
 .top-nav {
   background: var(--color-surface);
   border-color: var(--color-border) !important;
@@ -93,28 +147,113 @@ body {
 
 .top-nav-inner {
   align-items: center;
+  box-sizing: border-box;
   display: flex;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem 1.25rem;
   justify-content: space-between;
-  margin: 0 auto;
+  margin-inline: auto;
   max-width: 1400px;
-  padding: 0.875rem 1.5rem;
+  padding-block: 0.65rem;
+  padding-inline: var(--app-padding-inline);
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+  .top-nav-inner {
+    display: grid;
+    gap: 1rem 1.5rem;
+    grid-template-columns: minmax(0, auto) minmax(10rem, 1fr) auto;
+  }
+
+  .top-nav-search {
+    justify-self: center;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .top-nav-links {
+    margin-left: 0;
+  }
+}
+
+.top-nav-identity {
+  align-items: center;
+  display: flex;
+  flex: 0 1 auto;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.top-nav-logo {
+  flex-shrink: 0;
+  height: 40px;
+  object-fit: contain;
+  width: 40px;
 }
 
 .top-nav-brand {
-  flex: 0 0 auto;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.top-nav-search {
+  flex: 1 1 12rem;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: min(420px, 100%);
+  min-width: min(100%, 200px);
+  position: relative;
+}
+
+.top-nav-search-input {
+  background-color: var(--color-bg) !important;
+  border-color: var(--color-border) !important;
+  border-radius: 999px !important;
+  color: var(--color-text) !important;
+  padding: 0.45rem 0.85rem 0.45rem 2.5rem !important;
+}
+
+.top-nav-search-input:focus {
+  border-color: color-mix(in oklab, var(--color-coral), transparent 35%) !important;
+  box-shadow: 0 0 0 0.2rem color-mix(in oklab, var(--color-coral), transparent 82%) !important;
+}
+
+.top-nav-search-icon {
+  color: var(--color-text-muted);
+  left: 0.85rem;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+[data-bs-theme='dark'] .top-nav-search-input {
+  background-color: #0d1117 !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
 }
 
 .top-nav-links {
   align-items: center;
+  display: flex;
   flex-direction: row;
+  flex-shrink: 0;
+  gap: 0.25rem;
   justify-content: flex-end;
+  margin-left: auto;
 }
 
 .top-nav-links .nav-link {
   align-items: center !important;
+  border-radius: 0.5rem;
+  gap: 0.5rem !important;
   line-height: 1.25;
   min-height: 2.5rem;
+  padding: 0.45rem 0.85rem !important;
   white-space: nowrap;
 }
 
@@ -131,18 +270,30 @@ body {
   padding-top: 0.15rem;
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 991.98px) {
   .top-nav-inner {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.875rem;
-    padding: 0.875rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .top-nav-search {
+    flex: 1 1 100%;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: none;
+    order: 3;
+    width: 100%;
   }
 
   .top-nav-links {
-    justify-content: flex-start;
+    margin-left: 0;
+    order: 2;
     overflow-x: auto;
     padding-bottom: 0.125rem;
+    width: 100%;
+  }
+
+  .top-nav-identity {
+    order: 1;
     width: 100%;
   }
 }
@@ -167,8 +318,8 @@ body {
 }
 
 [data-bs-theme='dark'] .active-nav-link {
-  background: rgba(255, 154, 134, 0.08);
-  color: var(--color-cream) !important;
+  background: rgba(255, 154, 134, 0.12);
+  color: var(--color-text) !important;
 }
 
 .sparkline-wrap .recharts-wrapper {
@@ -205,4 +356,131 @@ body {
 
 .recharts-text {
   fill: var(--color-text-muted) !important;
+}
+
+.status-pill {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 0.4rem 0.7rem;
+  white-space: nowrap;
+}
+
+.status-pill--healthy {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.status-pill--warning {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.status-pill--critical {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.tank-card-footer-strip {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.tank-card-footer-strip--healthy {
+  background: #eaf3de;
+}
+
+.tank-card-footer-strip--warning {
+  background: #faeeda;
+}
+
+.tank-card-footer-strip--critical {
+  background: #fcebeb;
+}
+
+.tank-card-footer-row {
+  margin: 0;
+}
+
+.tank-card-footer-cell {
+  padding: 0.65rem 0.35rem;
+}
+
+.tank-card-footer-cell:not(:last-child) {
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.tank-card-footer-strip--healthy .tank-card-footer-label {
+  color: #3f6212;
+}
+
+.tank-card-footer-strip--healthy .tank-card-footer-value {
+  color: #14532d;
+  font-weight: 600;
+}
+
+.tank-card-footer-strip--warning .tank-card-footer-label {
+  color: #92400e;
+}
+
+.tank-card-footer-strip--warning .tank-card-footer-value {
+  color: #78350f;
+  font-weight: 600;
+}
+
+.tank-card-footer-strip--critical .tank-card-footer-label {
+  color: #991b1b;
+}
+
+.tank-card-footer-strip--critical .tank-card-footer-value {
+  color: #7f1d1d;
+  font-weight: 600;
+}
+
+.tank-card-footer-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+}
+
+.tank-card-footer-value {
+  font-size: 0.8125rem;
+}
+
+.dash-stat-cell {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  height: 100%;
+  padding: 0.85rem 1rem;
+}
+
+.dash-stat-label {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+.dash-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Tank detail — breadcrumb back (arrow + Dashboard) */
+.tank-detail-crumb-back {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.tank-detail-crumb-back:hover {
+  color: var(--color-coral);
 }

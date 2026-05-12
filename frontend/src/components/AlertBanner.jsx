@@ -16,14 +16,19 @@ export default function AlertBanner() {
   if (!message || dismissed) return null
 
   return (
-    <Alert variant="danger" dismissible onClose={() => setDismissed(true)} className="rounded-0 border-0 mb-0">
-      <div className="d-flex align-items-center gap-3">
-        <AlertTriangle size={20} />
-        <div className="flex-grow-1">
+    <Alert
+      variant="danger"
+      dismissible
+      onClose={() => setDismissed(true)}
+      className="alert-banner-edge rounded-0 border-0 mb-0"
+    >
+      <div className="alert-banner-inner d-flex flex-wrap align-items-center gap-3">
+        <AlertTriangle size={20} className="flex-shrink-0" />
+        <div className="flex-grow-1 min-w-0">
           <strong className="me-2">Critical acoustic alert</strong>
           <span>{message}</span>
         </div>
-        <Link className="btn btn-sm btn-outline-light" to="/alerts">
+        <Link className="btn btn-sm btn-outline-light flex-shrink-0" to="/alerts">
           Open alerts
         </Link>
       </div>
