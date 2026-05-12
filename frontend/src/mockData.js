@@ -287,21 +287,182 @@ export function getCalibrationSessionsForTank(tank) {
   }))
 }
 
-/** 24 hourly points for environmental charts */
-export function getEnvironmental24hForTank(tank) {
-  const t = tank
-  if (!t) return []
-  const hours = Array.from({ length: 24 }, (_, h) => {
-    const label = `${h.toString().padStart(2, '0')}:00`
-    const phase = (h / 24) * Math.PI * 2
-    return {
-      hour: label,
-      temperature: Number((t.temperature + Math.sin(phase) * 0.8 + (h - 12) * 0.02).toFixed(1)),
-      pH: Number((t.pH + Math.cos(phase * 0.7) * 0.06).toFixed(2)),
-      dissolvedOxygen: Number((t.dissolvedOxygen + Math.sin(phase * 1.3) * 0.35).toFixed(2)),
+/** Outdoor / weather station snapshot (mock) — one row per tank */
+export const mockOutdoorEnvironmentByTank = {
+  'tank-001': {
+    tempC: 28.4,
+    rhPct: 72,
+    rainMm: 0,
+    windSpeedKmh: 11,
+    windGustKmh: 21,
+    windDir: 'NE',
+    lux: 38_200,
+  },
+  'tank-002': {
+    tempC: 31.2,
+    rhPct: 84,
+    rainMm: 4.2,
+    windSpeedKmh: 18,
+    windGustKmh: 34,
+    windDir: 'E',
+    lux: 12_400,
+  },
+  'tank-003': {
+    tempC: 27.1,
+    rhPct: 68,
+    rainMm: 0,
+    windSpeedKmh: 9,
+    windGustKmh: 16,
+    windDir: 'SSE',
+    lux: 41_500,
+  },
+  'tank-004': {
+    tempC: 26.5,
+    rhPct: 65,
+    rainMm: 0.2,
+    windSpeedKmh: 7,
+    windGustKmh: 14,
+    windDir: 'NW',
+    lux: 36_800,
+  },
+  'tank-005': {
+    tempC: 25.8,
+    rhPct: 70,
+    rainMm: 0,
+    windSpeedKmh: 6,
+    windGustKmh: 11,
+    windDir: 'S',
+    lux: 0,
+  },
+  'tank-006': {
+    tempC: 29.0,
+    rhPct: 76,
+    rainMm: 1.1,
+    windSpeedKmh: 14,
+    windGustKmh: 26,
+    windDir: 'SW',
+    lux: 22_100,
+  },
+}
+
+export function getOutdoorEnvironmentSnapshotForTank(tank) {
+  const fallback = {
+    tempC: 27.0,
+    rhPct: 70,
+    rainMm: 0,
+    windSpeedKmh: 10,
+    windGustKmh: 18,
+    windDir: 'N',
+    lux: 30_000,
+  }
+  if (!tank?.id) return fallback
+  return mockOutdoorEnvironmentByTank[tank.id] ?? fallback
+}
+
+const WIND_LABEL_TO_DEG = {
+  N: 0,
+  NNE: 22.5,
+  NE: 45,
+  ENE: 67.5,
+  E: 90,
+  ESE: 112.5,
+  SE: 135,
+  SSE: 157.5,
+  S: 180,
+  SSW: 202.5,
+  SW: 225,
+  WSW: 247.5,
+  W: 270,
+  WNW: 292.5,
+  NW: 315,
+  NNW: 337.5,
+}
+
+export function windLabelToDegrees(label) {
+  if (label == null || label === '') return 0
+  const key = String(label).toUpperCase()
+  return WIND_LABEL_TO_DEG[key] ?? 0
+}
+
+export function windDegreesToLabel(deg) {
+  const d = ((Number(deg) % 360) + 360) % 360
+  const idx = Math.round(d / 22.5) % 16
+  const labels = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+  return labels[idx]
+}
+
+function hashTankId(id) {
+  let h = 2166136261
+  for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619)
+  return h >>> 0
+}
+
+function prng(seed, i, salt) {
+  const x = Math.sin((seed + i * 7919 + salt * 104729) * 0.00001) * 10000
+  return x - Math.floor(x)
+}
+
+/** Mock daily outdoor readings for ~3 months (aggregate per day). Last row matches snapshot. */
+export function getOutdoorEnvironmentDailySeriesForTank(tank) {
+  const snap = getOutdoorEnvironmentSnapshotForTank(tank)
+  const seed = hashTankId(tank?.id ?? '')
+  const totalDays = 90
+  const end = new Date('2026-05-12T12:00:00')
+
+  const targetDir = windLabelToDegrees(snap.windDir)
+
+  const out = []
+  for (let i = 0; i < totalDays; i++) {
+    const dayIndex = i
+    const d = new Date(end)
+    d.setDate(d.getDate() - (totalDays - 1 - dayIndex))
+    const day = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
+    const wobble = (salt, mag = 1) => (prng(seed, dayIndex, salt) - 0.5) * 2 * mag
+    const phase = (dayIndex / totalDays) * Math.PI * 2
+
+    let tempC = snap.tempC + Math.sin(phase * 1.3 + seed * 0.001) * 2.8 + wobble(1, 0.35)
+    let rhPct = snap.rhPct + Math.cos(phase * 0.9) * 8 + wobble(2, 3)
+    rhPct = Math.min(96, Math.max(38, rhPct))
+
+    let rainMm = 0
+    if (prng(seed, dayIndex, 3) > 0.82) rainMm = Number((prng(seed, dayIndex, 4) ** 2 * 22).toFixed(1))
+    if (prng(seed, dayIndex, 5) > 0.96) rainMm = Number((rainMm + prng(seed, dayIndex, 6) * 35).toFixed(1))
+
+    let windSpeedKmh = Math.max(2, snap.windSpeedKmh + Math.sin(phase * 1.1) * 5 + wobble(7, 1.2))
+    let windGustKmh = Math.max(windSpeedKmh + 4, snap.windGustKmh + Math.sin(phase * 0.8) * 8 + wobble(8, 2))
+
+    let windDirDeg = targetDir + Math.sin(phase * 0.7 + seed * 0.002) * 55 + wobble(9, 12) * 8
+    windDirDeg = ((windDirDeg % 360) + 360) % 360
+
+    let lux = Math.max(
+      0,
+      snap.lux * (0.25 + 0.75 * (0.55 + 0.45 * Math.abs(Math.sin(phase * 1.4)))) + wobble(10, 2800) * 4000,
+    )
+
+    if (dayIndex === totalDays - 1) {
+      tempC = snap.tempC
+      rhPct = snap.rhPct
+      rainMm = snap.rainMm
+      windSpeedKmh = snap.windSpeedKmh
+      windGustKmh = snap.windGustKmh
+      windDirDeg = ((targetDir % 360) + 360) % 360
+      lux = snap.lux
     }
-  })
-  return hours
+
+    out.push({
+      day,
+      tempC: Number(tempC.toFixed(1)),
+      rhPct: Number(rhPct.toFixed(1)),
+      rainMm: Number(rainMm.toFixed(1)),
+      windSpeedKmh: Number(windSpeedKmh.toFixed(1)),
+      windGustKmh: Number(windGustKmh.toFixed(1)),
+      windDirDeg: Number(windDirDeg.toFixed(1)),
+      lux: Math.round(lux),
+    })
+  }
+
+  return out
 }
 
 export const defaultThresholds = {

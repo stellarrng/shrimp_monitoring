@@ -6,7 +6,6 @@ import Button from 'react-bootstrap/Button'
 import { ArrowLeft } from 'lucide-react'
 import { useTankData } from '../../hooks/useTankData'
 import StatusPill from '../../components/StatusPill'
-import LiveAudio from './tabs/LiveAudio'
 import TrendGraphs from './tabs/TrendGraphs'
 import Calibration from './tabs/Calibration'
 import Environmental from './tabs/Environmental'
@@ -17,10 +16,9 @@ export default function TankDetail() {
 
   const tabItems = useMemo(
     () => [
-      { key: 'live', title: 'Live Audio', Comp: LiveAudio },
       { key: 'trends', title: 'Trends', Comp: TrendGraphs },
-      { key: 'cal', title: 'Calibration', Comp: Calibration },
       { key: 'env', title: 'Environment', Comp: Environmental },
+      { key: 'cal', title: 'Calibration', Comp: Calibration },
     ],
     [],
   )
@@ -68,7 +66,7 @@ export default function TankDetail() {
         </div>
       </div>
 
-      <Tabs defaultActiveKey="live" id="tank-detail-tabs" className="mb-3" justify variant="tabs">
+      <Tabs defaultActiveKey="trends" id="tank-detail-tabs" className="mb-3" justify variant="tabs">
         {tabItems.map(({ key, title, Comp }) => (
           <Tab key={key} eventKey={key} title={title}>
             <div className="pt-3">

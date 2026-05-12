@@ -3,7 +3,10 @@ const cors = require("cors");
 require("dotenv").config();
 
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, ScanCommand } = require("@aws-sdk/lib-dynamodb");
+const {
+  DynamoDBDocumentClient,
+  ScanCommand,
+} = require("@aws-sdk/lib-dynamodb");
 
 const app = express();
 
@@ -34,14 +37,28 @@ app.get("/api/sensor-data", async (req, res) => {
 
     const result = await docClient.send(command);
 
-    const data = (result.Items || []).sort((a, b) =>
-      String(a.date_time).localeCompare(String(b.date_time))
-    );
+    const data = (result.Items || [])
+      .sort((a, b) => String(a.date_time).localeCompare(String(b.date_time)))
+      .map((item) => ({
+        station: item.station,
+        date_time: item.date_time,
+
+        temperature: item["Temperature(oC)"],
+        humidity: item["Humidity(%)"],
+        windSpeed: item["Windspeed_(km/h)"],
+        windDirection: item["Wind_direction(0/360)"],
+        windGust: item["Wind_Gust(km/h)"],
+        rainfall: item["Rain_fall(mm)"],
+        solar: item["Solar_(Lux)"],
+        pressure: item["Pressure_(hpa)"],
+
+        recordId: item.recordId,
+      }));
 
     res.json({
       success: true,
       count: data.length,
-      data: data,
+      data,
     });
   } catch (error) {
     console.error("DynamoDB error:", error);

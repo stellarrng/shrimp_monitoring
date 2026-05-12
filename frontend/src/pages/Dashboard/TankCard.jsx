@@ -5,7 +5,12 @@ import { useNavigate } from 'react-router-dom'
 import { ResponsiveContainer, LineChart, Line, Tooltip } from 'recharts'
 import StatusPill from '../../components/StatusPill'
 import StatusDot from '../../components/StatusDot'
-import { getBaselineSignalLevel, getSignalLevel, mockSessionHistory } from '../../mockData'
+import {
+  getBaselineSignalLevel,
+  getOutdoorEnvironmentSnapshotForTank,
+  getSignalLevel,
+  mockSessionHistory,
+} from '../../mockData'
 
 function scoreTone(score) {
   if (score >= 75) return 'var(--color-healthy)'
@@ -26,6 +31,7 @@ export default function TankCard({ tank }) {
   const signalLevel = getSignalLevel(tank)
   const baselineSignal = getBaselineSignalLevel(tank)
   const online = tank.device?.esp32 === 'online'
+  const env = getOutdoorEnvironmentSnapshotForTank(tank)
 
   return (
     <Card role="button" className="surface-card h-100 overflow-hidden" onClick={() => navigate(`/tank/${tank.id}`)}>
@@ -81,15 +87,15 @@ export default function TankCard({ tank }) {
         <Row className="g-0 text-center small tank-card-footer-row">
           <Col xs={4} className="tank-card-footer-cell">
             <div className="tank-card-footer-label">Temp</div>
-            <div className="tank-card-footer-value font-mono-nums">{tank.temperature.toFixed(1)}°C</div>
+            <div className="tank-card-footer-value font-mono-nums">{env.tempC.toFixed(1)}°C</div>
           </Col>
           <Col xs={4} className="tank-card-footer-cell">
-            <div className="tank-card-footer-label">pH</div>
-            <div className="tank-card-footer-value font-mono-nums">{tank.pH.toFixed(2)}</div>
+            <div className="tank-card-footer-label">RH</div>
+            <div className="tank-card-footer-value font-mono-nums">{Math.round(env.rhPct)}%</div>
           </Col>
           <Col xs={4} className="tank-card-footer-cell">
-            <div className="tank-card-footer-label">DO</div>
-            <div className="tank-card-footer-value font-mono-nums">{tank.dissolvedOxygen.toFixed(1)} mg/L</div>
+            <div className="tank-card-footer-label">Rain</div>
+            <div className="tank-card-footer-value font-mono-nums">{env.rainMm.toFixed(1)} mm</div>
           </Col>
         </Row>
       </div>
