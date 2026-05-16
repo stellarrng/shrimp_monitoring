@@ -13,7 +13,6 @@ function wifiPct(db) {
   return Math.round(((clamped - worst) / (best - worst)) * 100)
 }
 
-/** TODO: ingest device telemetry from fleet API */
 export default function DeviceStatus() {
   const tanks = useTankStore((s) => s.tanks)
   const [tick, setTick] = useState(0)

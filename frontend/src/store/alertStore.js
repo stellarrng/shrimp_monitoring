@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { mockAlerts } from '../mockData'
 
-/** TODO: hydrate from alerting service */
 export const useAlertStore = create((set, get) => ({
   alerts: [...mockAlerts],
 

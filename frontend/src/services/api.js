@@ -1,5 +1,3 @@
-// TODO: replace with real API calls
-
 import { mockTanks, mockAlerts, mockSessionHistory } from '../mockData'
 
 export async function fetchTanks() {

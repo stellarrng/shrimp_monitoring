@@ -1,11 +1,9 @@
 import { create } from 'zustand'
 import { mockTanks } from '../mockData'
 
-/** TODO: hydrate from API / WebSocket payloads instead of mocks */
 export const useTankStore = create((set, get) => ({
   tanks: [...mockTanks],
   selectedTankId: null,
-  /** Live filter for navbar “Search tanks…” — matches name, species, or id (substring, case-insensitive). */
   tankSearchQuery: '',
 
   setTankSearchQuery: (tankSearchQuery) => set({ tankSearchQuery }),

@@ -43,7 +43,6 @@ function formatDetected(iso) {
   }
 }
 
-/** TODO: wire acknowledge endpoint */
 export default function Alerts() {
   const [tab, setTab] = useState('all')
 

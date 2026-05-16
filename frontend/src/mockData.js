@@ -1,5 +1,3 @@
-/** Central mock dataset — UI reads from stores hydrated from here. */
-
 const MAY_LAST_14 = Array.from({ length: 14 }, (_, i) => `May ${i + 1}`)
 
 const MONTH_30_DAYS = [
@@ -180,7 +178,6 @@ export const mockSessionHistory = {
   'tank-006': buildTrendSegment(MAY_LAST_14, 1.6, 0.9, 72, 55, -40, -32),
 }
 
-/** 30-day series including signal strength, health, noise amplitude index */
 export const mockTankTrendExtended = {
   'tank-001': buildTrendSegment(MONTH_30_DAYS, 2.05, 2.18, 85, 88, -36, -32),
   'tank-002': buildTrendSegment(MONTH_30_DAYS, 1.85, 0.7, 82, 42, -30, -45),
@@ -276,7 +273,6 @@ export const mockCalibrationEvents = {
   ],
 }
 
-/** Full 14-day calibration signal samples */
 export function getCalibrationSessionsForTank(tank) {
   const day = tank?.calibrationDay ?? 0
   const totalDays = 14
@@ -287,7 +283,6 @@ export function getCalibrationSessionsForTank(tank) {
   }))
 }
 
-/** Outdoor / weather station snapshot (mock) — one row per tank */
 export const mockOutdoorEnvironmentByTank = {
   'tank-001': {
     tempC: 28.4,
@@ -402,7 +397,6 @@ function prng(seed, i, salt) {
   return x - Math.floor(x)
 }
 
-/** Mock daily outdoor readings for ~3 months (aggregate per day). Last row matches snapshot. */
 export function getOutdoorEnvironmentDailySeriesForTank(tank) {
   const snap = getOutdoorEnvironmentSnapshotForTank(tank)
   const seed = hashTankId(tank?.id ?? '')

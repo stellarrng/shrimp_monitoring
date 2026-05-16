@@ -31,7 +31,6 @@ function formatLevel(value) {
   return `${value.toFixed(1)} level`
 }
 
-/** TODO: POST calibration milestones to backend */
 export default function Calibration({ tank }) {
   const updateTank = useTankStore((s) => s.updateTank)
   const [events, setEvents] = useState(() => [...(mockCalibrationEvents[tank.id] ?? [])])

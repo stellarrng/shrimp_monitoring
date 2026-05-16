@@ -15,7 +15,6 @@ import {
 } from 'recharts'
 import { getBaselineSignalLevel, mockTankTrendExtended } from '../../../mockData'
 
-/** TODO: replace with aggregated analytics API */
 export default function TrendGraphs({ tank }) {
   const [range, setRange] = useState(14)
 

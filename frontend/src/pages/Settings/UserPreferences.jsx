@@ -3,9 +3,7 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import { mockUser } from '../../services/auth'
 
-/** TODO: PATCH /preferences */
 function savePreferencesDraft() {
-  // TODO: replace with real API call
 }
 
 export default function UserPreferences() {

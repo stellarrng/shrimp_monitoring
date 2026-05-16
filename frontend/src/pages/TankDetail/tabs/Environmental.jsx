@@ -50,7 +50,6 @@ function formatStatsLine(s, unit, { latestKey, latestFmt } = {}) {
   return parts.join(' · ')
 }
 
-/** TODO: replace mock daily series with environmental / weather API */
 export default function Environmental({ tank }) {
   const fullSeries = useMemo(() => getOutdoorEnvironmentDailySeriesForTank(tank), [tank])
   const [range, setRange] = useState(30)

@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useTankStore } from '../store/tankStore'
 
-/** TODO: connect to WebSocket — currently simulates live signal drift */
 export function useWebSocket() {
   const patchLiveTelemetry = useTankStore((s) => s.patchLiveTelemetry)
 

@@ -6,7 +6,6 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import { defaultThresholds as initial } from '../../mockData'
 
-/** TODO: persist thresholds server-side */
 export default function AlertThresholds() {
   const [draft, setDraft] = useState(initial)
   const [saved, setSaved] = useState(false)
@@ -92,7 +91,6 @@ export default function AlertThresholds() {
 
       {saved && (
         <Alert variant="success" className="mt-3 mb-0">
-          {/* TODO: replace with toast + API PUT */}
           Thresholds stored locally (mock). Summary: {draft.lowPct}/{draft.mediumPct}/{draft.criticalPct}% · Temp {draft.tempMin}–{draft.tempMax} °C · pH {draft.phMin}–{draft.phMax} · DO &gt;{' '}
           {draft.doMin}
         </Alert>

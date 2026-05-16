@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 
-/** Online / warning / offline indicator for devices */
 export default function StatusDot({ status, pulse = false }) {
   const cfg = useMemo(() => {
     if (status === 'online') return { color: 'var(--color-healthy)', border: 'transparent' }
